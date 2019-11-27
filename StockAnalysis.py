@@ -277,13 +277,30 @@ def live_graph(inputStock, classifier, forcast_out):
 def find_low_points(data):
 
     derivatives = derivative_of(data.dataPerTime['close'])
-    low_points = {}
+    x = []
+    y = []
 
-    for minute in range(len(data.dataPerTime['date'])):
-        if (minute is not 0) or (minute is not (len(data.dataPerTime['date'] - 1))):
-            if (derivatives[minute - 1] < 0) and (derivatives[minute + 1] > 0):
-                low_points[minute]
+    for minute in range(len(data.dataPerTime['date']) - 1):
+        if (minute is not 0) and (minute is not (len(data.dataPerTime['date']) - 1)):
+            if (derivatives[minute - 1] < 0) and (derivatives[minute + 1] > 0): # If Slope goes from negative to positive then it is a local min
+                x.append(minute)
+                y.append(data.dataPerTime['close'][minute])
 
+    return x, y
+
+def find_high_points(data):
+
+    derivatives = derivative_of(data.dataPerTime['close'])
+    x = []
+    y = []
+
+    for minute in range(len(data.dataPerTime['date']) - 1):
+        if (minute is not 0) and (minute is not (len(data.dataPerTime['date']) - 1)):
+            if (derivatives[minute - 1] > 0) and (derivatives[minute + 1] < 0): # If Slope goes from positive to negative then it is a local max
+                x.append(minute)
+                y.append(data.dataPerTime['close'][minute])
+
+    return x, y
 ######################################################################################################
 
 global myClassifier
@@ -302,7 +319,12 @@ for stock in storage.allStocks:
     predictions = train_classifier(storage.allStocks[stock].dataPerTime, myClassifier, forcast_out)
     #lowPoints = find_low_points(storage.allStocks[stock])
     #plt.plot(lowPoints, 'p')
-    plt.plot(predictions, 'b')
-    plt.plot(storage.allStocks[stock].dataPerTime['close'], 'r')
+    #plt.plot(predictions, 'b')
+    plt.plot(storage.allStocks[stock].dataPerTime['close'], 'b')
+    x, y = find_low_points(storage.allStocks[stock])
+    j, k = find_high_points(storage.allStocks[stock])
+    #plt.plot(x, y, 'p')
+    #plt.plot(j, k, '^')
+    plt.plot(predictions, 'g')
     plt.title(stock)
     plt.show()
