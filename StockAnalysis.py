@@ -13,10 +13,10 @@ from sklearn.metrics import mean_squared_error
 from matplotlib import style
 from matplotlib import animation
 from matplotlib.pylab import *
-from mpl_toolkits.axes_grid1 import host_subplot
-from keras.layers.core import Dense, Activation, Dropout
-from keras.layers.recurrent import LSTM
-from keras.models import Sequential
+#from mpl_toolkits.axes_grid1 import host_subplot
+#from keras.layers.core import Dense, Activation, Dropout
+#from keras.layers.recurrent import LSTM
+#from keras.models import Sequential
 import time
 
 style.use('ggplot')
@@ -76,6 +76,9 @@ def best_fit_slope(xs,ys):
 def best_fit_intercept(xs,ys,m):
 
     return stats.mean(ys) - m*stats.mean(xs)
+
+def slope(leftX, leftY, rightX, rightY):
+          return float(rightY - leftY) / float(rightX - leftX)
 
 def derivative_of(aList):
     derivative = []
@@ -301,30 +304,94 @@ def find_high_points(data):
                 y.append(data.dataPerTime['close'][minute])
 
     return x, y
+
+def lowest_ranged(xContainer, yContainer, data, width):
+
+    halfRange = int(width / 2)
+    x = []
+    y = []
+
+    dumb = len(yContainer)
+    for index in range(dumb):
+        if (index > halfRange) and (index < (dumb - halfRange)):
+            if (yContainer[index] == min(yContainer[index - halfRange:index + halfRange])):
+                x.append(xContainer[index])
+                y.append(yContainer[index])
+    
+    i = 0
+    while (i < (len(x) - 1)):
+        leftX = x[i]
+        leftY = y[i]
+        rightX = x[i + 1]
+        rightY = y[i + 1]
+        M = slope(leftX, leftY, rightX, rightY)
+        for j in range(rightX - leftX):
+            linearPoint = leftY + (M*j)
+            realPoint = data[leftX + j]
+            if (realPoint < linearPoint):
+                x.insert((i+1), (leftX + j))
+                y.insert((i+1), realPoint)
+                break
+        i += 1
+    
+    return x, y
+
+def highest_ranged(xContainer, yContainer, data, width):
+
+    halfRange = int(width / 2)
+    x = []
+    y = []
+
+    dumb = len(yContainer)
+    for index in range(dumb):
+        if (index > halfRange) and (index < (dumb - halfRange)):
+            if (yContainer[index] == max(yContainer[index - halfRange:index + halfRange])):
+                x.append(xContainer[index])
+                y.append(yContainer[index])
+
+    i = 0
+    while (i < (len(x) - 1)):
+        leftX = x[i]
+        leftY = y[i]
+        rightX = x[i + 1]
+        rightY = y[i + 1]
+        M = slope(leftX, leftY, rightX, rightY)
+        for j in range(rightX - leftX):
+            linearPoint = leftY + (M*j)
+            realPoint = data[leftX + j]
+            if (realPoint > linearPoint):
+                x.insert((i+1), (leftX + j))
+                y.insert((i+1), realPoint)
+                break
+        i += 1
+
+    return x, y
+
 ######################################################################################################
 
-global myClassifier
-global kerasClassifier 
+#global myClassifier
+#global kerasClassifier 
 
 myClassifier = LinearRegression(fit_intercept=True, normalize=True, n_jobs=-1)
-kerasClassifier = Sequential()
+#kerasClassifier = Sequential()
 
 storage = Game()
-storage.load_stocks('S&P500')
+storage.load_stocks('under10')
 forcast_out = 50
-testRange = 500
+testRange = 15
 
 for stock in storage.allStocks:
     #predictions = keras_train_classifier(storage.allStocks[stock].dataPerTime, kerasClassifier, forcast_out)
     predictions = train_classifier(storage.allStocks[stock].dataPerTime, myClassifier, forcast_out)
-    #lowPoints = find_low_points(storage.allStocks[stock])
-    #plt.plot(lowPoints, 'p')
     #plt.plot(predictions, 'b')
+
     plt.plot(storage.allStocks[stock].dataPerTime['close'], 'b')
-    x, y = find_low_points(storage.allStocks[stock])
-    j, k = find_high_points(storage.allStocks[stock])
-    #plt.plot(x, y, 'p')
-    #plt.plot(j, k, '^')
-    plt.plot(predictions, 'g')
+    #x, y = find_low_points(storage.allStocks[stock])
+    #j, k = find_high_points(storage.allStocks[stock])
+    #x, y = lowest_ranged(x, y, storage.allStocks[stock].dataPerTime['close'], testRange)
+    #j, k = highest_ranged(j, k, storage.allStocks[stock].dataPerTime['close'], testRange)
+    #plt.plot(x, y, 'r')
+    #plt.plot(j, k, 'y')
+    plt.plot(predictions, 'r')
     plt.title(stock)
     plt.show()
