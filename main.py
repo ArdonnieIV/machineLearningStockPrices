@@ -1,4 +1,3 @@
-from SP500Tickers import save_sp500_tickers
 from GameClass import Game
 from StockClass import StockData
 
@@ -40,4 +39,3 @@ def play_game():
         playerInput = input()
 
 ######################################################################################################  
-

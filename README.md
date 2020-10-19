@@ -1,2 +1,6 @@
 # machineLearningStockPrices
-An attempt to make bank.
+matplotlib
+pandas
+sklearn
+alpha_vantage
+mplfinance

@@ -2,7 +2,7 @@ from alpha_vantage.timeseries import TimeSeries
 import csv
 import os
 
-location = 'C:/Users/Donnie/source/repos/MLStockTrader/MLStockTrader/'
+location = 'C:/MyCode/machineLearningStockPrices/' # TODO : Change location to the address of your reposity.
 
 ######################################################################################################  
 

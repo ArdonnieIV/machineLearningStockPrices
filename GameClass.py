@@ -1,9 +1,9 @@
 from matplotlib import style
-from mpl_finance import candlestick_ohlc
 from StockClass import StockData, location
 import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import mplfinance
 import numpy as np
 import time
 import os
@@ -109,7 +109,7 @@ class Game:
 
     def update_current_prices(self):
         for stock in self.allStocks:
-            self.allStocks[key].update_current_price(self.minute)
+            self.allStocks[stock].update_current_price(self.minute)
  
     def menu(self):
 
