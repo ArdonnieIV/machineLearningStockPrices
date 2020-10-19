@@ -23,12 +23,11 @@ style.use('ggplot')
 
 ######################################################################################################  
 
-def display_data(type):
+def display_data(type): # Just for visual practice
 
     sp500Game = Game()
     sp500Game.load_stocks(type)
 
-# Just for visual practice
     numOfGraphs = 6
     i = 1
     for stock in sp500Game.allStocks:
